@@ -182,8 +182,8 @@ transition - all
 duration - 300
                   
                   ${
-    active
-        ? `
+  active
+    ? `
                         bg-blue-600/20
                         border
                         border-blue-500/20
@@ -191,7 +191,7 @@ duration - 300
                         shadow-lg
                         shadow-blue-500/10
                       `
-        : `
+    : `
                         text-gray-400
                         hover:bg-white/5
                         hover:text-white

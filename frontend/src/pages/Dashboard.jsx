@@ -185,6 +185,19 @@ text - xl
           icon="⚠️"
         />
       </div>
+      {overview?.lowStock?.length > 0 && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3 mb-4">
+          <span className="text-red-600 text-lg">⚠️</span>
+
+          <div className="text-red-700 font-medium">
+            Low Stock Alert: {overview.lowStock.length} products are running low
+
+            <div className="text-sm font-normal mt-1">
+              {overview.lowStock.map((p) => p.name).join(", ")}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* CHARTS */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">

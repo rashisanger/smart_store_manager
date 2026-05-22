@@ -1,438 +1,242 @@
 
-import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 
-import api from "../api/axios";
+// ================= ICONS =================
 
-import ProductForm from "../components/ProductForm";
+const DashboardIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="w-5 h-5"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M3 9.75L12 4l9 5.75V20a1 1 0 01-1 1h-5.25v-6h-5.5v6H4a1 1 0 01-1-1V9.75z"
+    />
+  </svg>
+);
 
-const Products = () => {
-  const [products, setProducts] = useState([]);
+const ProductsIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="w-5 h-5"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M20 7L12 3 4 7m16 0v10l-8 4m8-4-8-4m0 8-8-4V7m8 4V3"
+    />
+  </svg>
+);
 
-  const [loading, setLoading] = useState(true);
+const AIIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="w-5 h-5"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"
+    />
+  </svg>
+);
 
-  const [error, setError] = useState("");
+// ================= NAV ITEMS =================
 
-  const [showModal, setShowModal] =
-    useState(false);
+const navItems = [
+  {
+    label: "Dashboard",
+    path: "/",
+    icon: <DashboardIcon />,
+  },
+  {
+    label: "Products",
+    path: "/products",
+    icon: <ProductsIcon />,
+  },
+  {
+    label: "AI Tools",
+    path: "/ai-tools",
+    icon: <AIIcon />,
+  },
+];
 
-  const [editingProduct, setEditingProduct] =
-    useState(null);
+const Sidebar = () => {
+  const location = useLocation();
 
-  // ================= FETCH PRODUCTS =================
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-
-      const { data } = await api.get("/products");
-
-      setProducts(data);
-    } catch (err) {
-      setError(
-        err.response?.data?.error ||
-          "Failed to fetch products"
-      );
-    } finally {
-      setLoading(false);
+  const isActive = (path) => {
+    if (path === "/") {
+      return location.pathname === "/";
     }
+
+    return location.pathname.startsWith(path);
   };
-
-  // ================= DELETE =================
-
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Delete this product?"
-    );
-
-    if (!confirmDelete) return;
-
-    try {
-      await api.delete(`/ products / ${ id } `);
-
-      setProducts((prev) =>
-        prev.filter((p) => p._id !== id)
-      );
-    } catch (err) {
-      alert("Failed to delete product");
-    }
-  };
-
-  // ================= SAVE =================
-
-  const handleSave = (savedProduct) => {
-    if (editingProduct) {
-      setProducts((prev) =>
-        prev.map((p) =>
-          p._id === savedProduct._id
-            ? savedProduct
-            : p
-        )
-      );
-    } else {
-      setProducts((prev) => [
-        savedProduct,
-        ...prev,
-      ]);
-    }
-
-    setShowModal(false);
-
-    setEditingProduct(null);
-  };
-
-  // ================= LOADING =================
-
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        {/* HEADER */}
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="h-10 w-52 bg-white/10 rounded-xl animate-pulse"></div>
-
-            <div className="h-4 w-72 bg-white/10 rounded mt-3 animate-pulse"></div>
-          </div>
-
-          <div className="h-12 w-40 bg-white/10 rounded-xl animate-pulse"></div>
-        </div>
-
-        {/* TABLE */}
-        <div
-          className="
-          bg-white/5
-          border
-          border-white/10
-          rounded-3xl
-          overflow-hidden
-          backdrop-blur-xl
-          "
-        >
-          {[1, 2, 3].map((item) => (
-            <div
-              key={item}
-              className="
-              flex
-              items-center
-              justify-between
-              px-6
-              py-6
-              border-b
-              border-white/5
-              animate-pulse
-              "
-            >
-              <div className="h-5 w-40 bg-white/10 rounded"></div>
-
-              <div className="h-5 w-24 bg-white/10 rounded"></div>
-
-              <div className="h-5 w-20 bg-white/10 rounded"></div>
-
-              <div className="h-5 w-16 bg-white/10 rounded"></div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // ================= UI =================
 
   return (
-    <div className="space-y-8">
-      {/* HEADER */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-4xl font-bold text-white">
-            Products
-          </h1>
-
-          <p className="text-gray-400 mt-2">
-            Manage your AI-powered products
-          </p>
-        </div>
-
-        <button
-          onClick={() => {
-            setEditingProduct(null);
-
-            setShowModal(true);
-          }}
-          className="
-          px-5
-          py-3
-          rounded-2xl
-          bg-blue-600
-          hover:bg-blue-500
-          transition-all
-          duration-300
-          hover:scale-105
-          shadow-lg
-          shadow-blue-500/30
-          text-white
-          font-semibold
-          "
-        >
-          + Add Product
-        </button>
-      </div>
-
-      {/* ERROR */}
-      {error && (
-        <div
-          className="
-          bg-red-500/10
-          border
-          border-red-500/20
-          text-red-400
-          px-5
-          py-4
-          rounded-2xl
-          "
-        >
-          {error}
-        </div>
-      )}
-
-      {/* EMPTY STATE */}
-      {!products.length ? (
-        <div
-          className="
-          flex
-          flex-col
-          items-center
-          justify-center
-          py-28
-          rounded-3xl
-          border
-          border-white/10
-          bg-white/5
-          backdrop-blur-xl
-          "
-        >
-          <div className="text-7xl mb-6">
-            📦
+    <aside
+      className="
+      fixed
+      top-0
+      left-0
+      bottom-0
+      w-56
+      z-50
+      bg-[#081225]/90
+      backdrop-blur-xl
+      border-r
+      border-white/10
+      flex
+      flex-col
+      "
+    >
+      {/* LOGO */}
+      <div
+        className="
+        h-16
+        border-b
+        border-white/10
+        flex
+        items-center
+        px-6
+        "
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="
+            w-10
+            h-10
+            rounded-xl
+            bg-gradient-to-br
+            from-blue-500
+            to-indigo-600
+            flex
+            items-center
+            justify-center
+            shadow-lg
+            shadow-blue-500/30
+            "
+          >
+            <span className="text-white font-bold text-lg">
+              S
+            </span>
           </div>
 
-          <h2 className="text-3xl font-bold text-white mb-3">
-            No products yet
-          </h2>
-
-          <p className="text-gray-400 text-lg">
-            Add your first AI-powered product now.
-          </p>
+          <div>
+            <h1 className="text-lg font-bold text-white">
+              SmartStore
+              <span className="text-blue-400">
+                {" "}AI
+              </span>
+            </h1>
+          </div>
         </div>
-      ) : (
-        <div
+      </div>
+
+      {/* NAVIGATION */}
+      <div className="flex-1 overflow-y-auto py-6">
+        <p
           className="
-          overflow-hidden
-          rounded-3xl
-          border
-          border-white/10
-          bg-white/5
-          backdrop-blur-xl
+          px-6
+          mb-4
+          text-xs
+          font-semibold
+          tracking-[0.2em]
+          uppercase
+          text-gray-500
           "
         >
-          {/* TABLE */}
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              {/* HEADER */}
-              <thead
-                className="
-                bg-white/5
-                border-b
-                border-white/10
-                "
-              >
-                <tr>
-                  {[
-                    "Name",
-                    "Category",
-                    "Price",
-                    "Stock",
-                    "Description",
-                    "Actions",
-                  ].map((head) => (
-                    <th
-                      key={head}
-                      className="
-                      px-6
-                      py-4
-                      text-left
-                      text-xs
-                      uppercase
-                      tracking-wider
-                      text-gray-400
-                      font-semibold
-                      "
-                    >
-                      {head}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
+          Navigation
+        </p>
 
-              {/* BODY */}
-              <tbody>
-                {products.map((product) => (
-                  <tr
-                    key={product._id}
-                    className="
-                    border-b
-                    border-white/5
-                    hover:bg-white/5
-                    transition
-                    "
-                  >
-                    {/* NAME */}
-                    <td className="px-6 py-5">
-                      <div>
-                        <h3 className="font-semibold text-white">
-                          {product.name}
-                        </h3>
-                      </div>
-                    </td>
+        <nav className="space-y-2 px-3">
+          {navItems.map((item) => {
+            const active = isActive(item.path);
 
-                    {/* CATEGORY */}
-                    <td className="px-6 py-5">
-                      <span
-                        className="
-                        px-3
-                        py-1
-                        rounded-full
-                        bg-blue-500/10
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`
+flex
+items - center
+gap - 3
+px - 4
+py - 3
+rounded - 2xl
+text - sm
+font - medium
+transition - all
+duration - 300
+                  
+                  ${
+  active
+    ? `
+                        bg-blue-600/20
                         border
                         border-blue-500/20
                         text-blue-400
-                        text-xs
-                        font-medium
-                        "
-                      >
-                        {product.category}
-                      </span>
-                    </td>
-
-                    {/* PRICE */}
-                    <td className="px-6 py-5 text-white font-medium">
-                      ${product.price}
-                    </td>
-
-                    {/* STOCK */}
-                    <td className="px-6 py-5">
-                      <span
-                        className={`
-px - 3
-py - 1
-rounded - full
-text - xs
-font - semibold
-border
-                          
-                          ${
-  product.stock <= 5
-    ? `
-                                bg-red-500/10
-                                border-red-500/20
-                                text-red-400
-                              `
+                        shadow-lg
+                        shadow-blue-500/10
+                      `
     : `
-                                bg-green-500/10
-                                border-green-500/20
-                                text-green-400
-                              `
+                        text-gray-400
+                        hover:bg-white/5
+                        hover:text-white
+                      `
 }
 `}
-                      >
-                        {product.stock} in stock
-                      </span>
-                    </td>
+              >
+                {item.icon}
 
-                    {/* DESCRIPTION */}
-                    <td className="px-6 py-5 text-gray-400 max-w-xs truncate">
-                      {product.description?.slice(
-                        0,
-                        50
-                      ) || "No description"}
-                    </td>
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
 
-                    {/* ACTIONS */}
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => {
-                            setEditingProduct(
-                              product
-                            );
+      {/* FOOTER */}
+      <div
+        className="
+        border-t
+        border-white/10
+        p-5
+        "
+      >
+        <div
+          className="
+          bg-white/5
+          border
+          border-white/10
+          rounded-2xl
+          p-4
+          "
+        >
+          <p className="text-xs text-gray-400 mb-1">
+            SmartStore AI
+          </p>
 
-                            setShowModal(true);
-                          }}
-                          className="
-                          px-4
-                          py-2
-                          rounded-xl
-                          border
-                          border-blue-500/20
-                          bg-blue-500/10
-                          text-blue-400
-                          hover:bg-blue-500
-                          hover:text-white
-                          transition-all
-                          duration-300
-                          "
-                        >
-                          Edit
-                        </button>
-
-                        <button
-                          onClick={() =>
-                            handleDelete(
-                              product._id
-                            )
-                          }
-                          className="
-                          px-4
-                          py-2
-                          rounded-xl
-                          border
-                          border-red-500/20
-                          bg-red-500/10
-                          text-red-400
-                          hover:bg-red-500
-                          hover:text-white
-                          transition-all
-                          duration-300
-                          "
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <h3 className="text-sm font-semibold text-white">
+            Version 1.0.0
+          </h3>
         </div>
-      )}
-
-      {/* MODAL */}
-      {showModal && (
-        <ProductForm
-          product={editingProduct}
-          onSave={handleSave}
-          onClose={() => {
-            setShowModal(false);
-
-            setEditingProduct(null);
-          }}
-        />
-      )}
-    </div>
+      </div>
+    </aside>
   );
 };
 
-export default Products;
+export default Sidebar;
 
