@@ -1,14 +1,19 @@
+
 import {
   Routes,
   Route,
   Navigate,
 } from "react-router-dom";
 
-import { lazy, Suspense } from "react";
+import {
+  lazy,
+  Suspense,
+} from "react";
 
 import { useAuth } from "./context/AuthContext";
 
-// LAZY PAGES
+// ================= PAGES =================
+
 const Login = lazy(() =>
   import("./pages/Login")
 );
@@ -29,7 +34,8 @@ const AITools = lazy(() =>
   import("./pages/AITools")
 );
 
-// COMPONENTS
+// ================= COMPONENTS =================
+
 const Navbar = lazy(() =>
   import("./components/Navbar")
 );
@@ -38,30 +44,45 @@ const Sidebar = lazy(() =>
   import("./components/Sidebar")
 );
 
-// PRIVATE ROUTE
+// ================= LOADER =================
+
+const PageLoader = () => (
+  <div className="h-screen flex items-center justify-center bg-[#071120]">
+    <div className="flex flex-col items-center gap-4">
+      <div className="w-14 h-14 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+
+      <h2 className="text-white text-lg font-semibold tracking-wide">
+        Loading SmartStore AI...
+      </h2>
+    </div>
+  </div>
+);
+
+// ================= PRIVATE ROUTE =================
+
 const PrivateRoute = ({ children }) => {
   const { token } = useAuth();
 
   if (!token) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
   return (
-    
-    <div className="flex min-h-screen bg-[#0f172a]">
-      
+    <div className="min-h-screen bg-gradient-to-br from-[#071120] via-[#0B1730] to-[#0F1C2E] text-white">
       {/* SIDEBAR */}
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<PageLoader />}>
         <Sidebar />
       </Suspense>
 
-      {/* MAIN */}
-      <div className="flex-1">
-        <Suspense fallback={<div>Loading...</div>}>
+      {/* MAIN CONTENT */}
+      <div className="ml-56">
+        {/* NAVBAR */}
+        <Suspense fallback={<PageLoader />}>
           <Navbar />
         </Suspense>
 
-        <main className="p-6">
+        {/* PAGE CONTENT */}
+        <main className="pt-20 p-8 min-h-screen">
           {children}
         </main>
       </div>
@@ -69,17 +90,14 @@ const PrivateRoute = ({ children }) => {
   );
 };
 
+// ================= APP =================
+
 function App() {
   return (
-    <Suspense
-      fallback={
-        <div className="h-screen flex items-center justify-center bg-[#0f172a] text-white">
-          Loading...
-        </div>
-      }
-    >
+    <Suspense fallback={<PageLoader />}>
       <Routes>
-        {/* PUBLIC */}
+        {/* PUBLIC ROUTES */}
+
         <Route
           path="/login"
           element={<Login />}
@@ -90,7 +108,8 @@ function App() {
           element={<Signup />}
         />
 
-        {/* PRIVATE */}
+        {/* PRIVATE ROUTES */}
+
         <Route
           path="/"
           element={
@@ -119,9 +138,10 @@ function App() {
         />
 
         {/* FALLBACK */}
+
         <Route
           path="*"
-          element={<Navigate to="/" />}
+          element={<Navigate to="/" replace />}
         />
       </Routes>
     </Suspense>
@@ -129,3 +149,4 @@ function App() {
 }
 
 export default App;
+
