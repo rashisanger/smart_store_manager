@@ -47,7 +47,9 @@ const PrivateRoute = ({ children }) => {
   }
 
   return (
+    
     <div className="flex min-h-screen bg-[#0f172a]">
+      
       {/* SIDEBAR */}
       <Suspense fallback={<div>Loading...</div>}>
         <Sidebar />
