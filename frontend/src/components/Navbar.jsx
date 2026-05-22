@@ -1,10 +1,8 @@
-
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
-
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -19,7 +17,7 @@ const Navbar = () => {
       .map((word) => word[0])
       .join("")
       .toUpperCase()
-      .slice(0, 2);
+      .slice(0, 2) || "AD";
   };
 
   return (
@@ -32,54 +30,28 @@ const Navbar = () => {
       h-16
       z-40
       border-b
-      border-white/10
-      bg-[#081225]/80
+      border-white/5
+      bg-[#020817]/65
       backdrop-blur-xl
       flex
       items-center
       justify-between
       px-8
+      shadow-sm
       "
     >
-      {/* LEFT */}
+      {/* LEFT BRAND CORNER IN NAVBAR */}
       <div className="flex items-center gap-3">
-        <div
-          className="
-          w-10
-          h-10
-          rounded-xl
-          bg-gradient-to-br
-          from-blue-500
-          to-blue-700
-          flex
-          items-center
-          justify-center
-          shadow-lg
-          shadow-blue-500/30
-          "
-        >
-          <span className="text-white font-bold text-lg">
-            S
-          </span>
-        </div>
-
-        <div>
-          <h1 className="text-lg font-bold text-white tracking-wide">
-            SmartStore
-            <span className="text-blue-400">
-              {" "}AI
-            </span>
-          </h1>
-
-          <p className="text-xs text-gray-400">
-            AI Commerce Dashboard
-          </p>
+        <div className="flex items-center gap-1.5 bg-[#0a1224] border border-white/5 px-3 py-1 rounded-full text-xs text-gray-400">
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+          <span>Admin Portal</span>
         </div>
       </div>
 
-      {/* RIGHT */}
+      {/* RIGHT CONTROLS */}
       <div className="flex items-center gap-5">
-        {/* USER INFO */}
+
+        {/* USER PROFILE INFO PANEL */}
         <div
           className="
           flex
@@ -87,19 +59,19 @@ const Navbar = () => {
           gap-3
           bg-white/5
           border
-          border-white/10
-          px-4
-          py-2
+          border-white/5
+          px-3
+          py-1.5
           rounded-2xl
           "
         >
-          {/* AVATAR */}
+          {/* AVATAR GAUGE */}
           <div
             className="
-            w-11
-            h-11
-            rounded-full
-            bg-gradient-to-br
+            w-9
+            h-9
+            rounded-xl
+            bg-gradient-to-tr
             from-blue-500
             to-indigo-600
             flex
@@ -107,26 +79,26 @@ const Navbar = () => {
             justify-center
             text-white
             font-bold
-            shadow-lg
-            shadow-blue-500/30
+            text-xs
+            shadow-md
+            shadow-blue-500/10
             "
           >
             {getInitials(user?.name)}
           </div>
 
-          {/* NAME */}
+          {/* PROFILE TEXT */}
           <div className="leading-tight">
-            <h3 className="text-sm font-semibold text-white">
-              {user?.name || "Admin User"}
+            <h3 className="text-xs font-bold text-white font-outfit">
+              {user?.name || "Admin Manager"}
             </h3>
-
-            <p className="text-xs text-gray-400">
-              Administrator
+            <p className="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">
+              {user?.role || "Administrator"}
             </p>
           </div>
         </div>
 
-        {/* LOGOUT BUTTON */}
+        {/* LOGOUT SECURE ACTION */}
         <button
           onClick={handleLogout}
           className="
@@ -135,16 +107,18 @@ const Navbar = () => {
           rounded-xl
           bg-red-500/10
           border
-          border-red-500/20
+          border-red-500/10
           text-red-400
           hover:bg-red-500
           hover:text-white
           transition-all
           duration-300
-          hover:scale-105
+          text-xs
+          font-bold
+          shadow-sm
           "
         >
-          Logout
+          Sign Out
         </button>
       </div>
     </header>
