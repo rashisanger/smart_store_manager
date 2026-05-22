@@ -26,14 +26,12 @@ app.use(express.json());
 const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
 const aiRoutes = require("./routes/aiRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/ai", aiRoutes);
-
-app.use("/api/dashboard", (req, res) => {
-    res.json({ message: "Dashboard route working" });
-});
+app.use("/api/dashboard", dashboardRoutes);
 
 // Root Route
 app.get("/", (req, res) => {
