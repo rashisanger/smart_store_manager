@@ -23,9 +23,8 @@ app.use(
 app.use(express.json());
 
 // Route Placeholders
-app.use("/api/auth", (req, res) => {
-    res.json({ message: "Auth route working" });
-});
+const authRoutes = require("./routes/authRoutes");
+app.use("/api/auth", authRoutes);
 
 app.use("/api/products", (req, res) => {
     res.json({ message: "Products route working" });
