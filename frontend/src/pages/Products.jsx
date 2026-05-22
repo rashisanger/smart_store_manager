@@ -1,242 +1,148 @@
+import React, { useEffect, useState } from "react";
+import api from "../api/axios";
+const Products = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-import { Link, useLocation } from "react-router-dom";
+  const [form, setForm] = useState({
+    name: "",
+    category: "",
+    price: "",
+    stock: "",
+  });
 
-// ================= ICONS =================
+  const [showForm, setShowForm] = useState(false);
 
-const DashboardIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="w-5 h-5"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth={2}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M3 9.75L12 4l9 5.75V20a1 1 0 01-1 1h-5.25v-6h-5.5v6H4a1 1 0 01-1-1V9.75z"
-    />
-  </svg>
-);
-
-const ProductsIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="w-5 h-5"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth={2}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M20 7L12 3 4 7m16 0v10l-8 4m8-4-8-4m0 8-8-4V7m8 4V3"
-    />
-  </svg>
-);
-
-const AIIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="w-5 h-5"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth={2}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"
-    />
-  </svg>
-);
-
-// ================= NAV ITEMS =================
-
-const navItems = [
-  {
-    label: "Dashboard",
-    path: "/",
-    icon: <DashboardIcon />,
-  },
-  {
-    label: "Products",
-    path: "/products",
-    icon: <ProductsIcon />,
-  },
-  {
-    label: "AI Tools",
-    path: "/ai-tools",
-    icon: <AIIcon />,
-  },
-];
-
-const Sidebar = () => {
-  const location = useLocation();
-
-  const isActive = (path) => {
-    if (path === "/") {
-      return location.pathname === "/";
+  // FETCH PRODUCTS
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get("/products"); // ✅ FIXED
+      setProducts(res.data);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    return location.pathname.startsWith(path);
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  // CREATE PRODUCT
+  const handleCreate = async () => {
+    try {
+      await api.post("/products", form);
+      setForm({ name: "", category: "", price: "", stock: "" });
+      setShowForm(false);
+      fetchProducts();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
-    <aside
-      className="
-      fixed
-      top-0
-      left-0
-      bottom-0
-      w-56
-      z-50
-      bg-[#081225]/90
-      backdrop-blur-xl
-      border-r
-      border-white/10
-      flex
-      flex-col
-      "
-    >
-      {/* LOGO */}
-      <div
-        className="
-        h-16
-        border-b
-        border-white/10
-        flex
-        items-center
-        px-6
-        "
-      >
-        <div className="flex items-center gap-3">
-          <div
-            className="
-            w-10
-            h-10
-            rounded-xl
-            bg-gradient-to-br
-            from-blue-500
-            to-indigo-600
-            flex
-            items-center
-            justify-center
-            shadow-lg
-            shadow-blue-500/30
-            "
-          >
-            <span className="text-white font-bold text-lg">
-              S
-            </span>
-          </div>
+    <div className="text-white">
+      {/* HEADER */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Products</h1>
 
-          <div>
-            <h1 className="text-lg font-bold text-white">
-              SmartStore
-              <span className="text-blue-400">
-                {" "}AI
-              </span>
-            </h1>
-          </div>
-        </div>
+        <button
+          onClick={() => setShowForm(true)}
+          className="bg-blue-600 px-4 py-2 rounded-lg"
+        >
+          + Add Product
+        </button>
       </div>
 
-      {/* NAVIGATION */}
-      <div className="flex-1 overflow-y-auto py-6">
-        <p
-          className="
-          px-6
-          mb-4
-          text-xs
-          font-semibold
-          tracking-[0.2em]
-          uppercase
-          text-gray-500
-          "
-        >
-          Navigation
-        </p>
+      {/* FORM MODAL */}
+      {showForm && (
+        <div className="bg-black/60 fixed inset-0 flex items-center justify-center">
+          <div className="bg-white text-black p-6 rounded-xl w-[400px]">
+            <h2 className="text-xl font-bold mb-4">Add Product</h2>
 
-        <nav className="space-y-2 px-3">
-          {navItems.map((item) => {
-            const active = isActive(item.path);
+            <input
+              placeholder="Name"
+              className="border w-full p-2 mb-2"
+              onChange={(e) =>
+                setForm({ ...form, name: e.target.value })
+              }
+            />
 
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`
-flex
-items - center
-gap - 3
-px - 4
-py - 3
-rounded - 2xl
-text - sm
-font - medium
-transition - all
-duration - 300
-                  
-                  ${
-  active
-    ? `
-                        bg-blue-600/20
-                        border
-                        border-blue-500/20
-                        text-blue-400
-                        shadow-lg
-                        shadow-blue-500/10
-                      `
-    : `
-                        text-gray-400
-                        hover:bg-white/5
-                        hover:text-white
-                      `
-}
-`}
+            <input
+              placeholder="Category"
+              className="border w-full p-2 mb-2"
+              onChange={(e) =>
+                setForm({ ...form, category: e.target.value })
+              }
+            />
+
+            <input
+              placeholder="Price"
+              className="border w-full p-2 mb-2"
+              onChange={(e) =>
+                setForm({ ...form, price: e.target.value })
+              }
+            />
+
+            <input
+              placeholder="Stock"
+              className="border w-full p-2 mb-4"
+              onChange={(e) =>
+                setForm({ ...form, stock: e.target.value })
+              }
+            />
+
+            <div className="flex gap-2">
+              <button
+                onClick={handleCreate}
+                className="bg-blue-600 text-white px-4 py-2 rounded"
               >
-                {item.icon}
+                Save
+              </button>
 
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
-
-      {/* FOOTER */}
-      <div
-        className="
-        border-t
-        border-white/10
-        p-5
-        "
-      >
-        <div
-          className="
-          bg-white/5
-          border
-          border-white/10
-          rounded-2xl
-          p-4
-          "
-        >
-          <p className="text-xs text-gray-400 mb-1">
-            SmartStore AI
-          </p>
-
-          <h3 className="text-sm font-semibold text-white">
-            Version 1.0.0
-          </h3>
+              <button
+                onClick={() => setShowForm(false)}
+                className="bg-gray-400 px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-    </aside>
+      )}
+
+      {/* TABLE */}
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <div className="bg-white/10 p-4 rounded-xl">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="text-gray-300">
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {products.map((p) => (
+                <tr key={p._id} className="border-t border-white/10">
+                  <td>{p.name}</td>
+                  <td>{p.category}</td>
+                  <td>${p.price}</td>
+                  <td>{p.stock}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
   );
 };
 
-export default Sidebar;
-
+export default Products;
